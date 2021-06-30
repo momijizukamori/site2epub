@@ -1,0 +1,33 @@
+{
+  "manifest_version": 2,
+  "name": "jjwxc2epub",
+  "description": "Download novels from JJWXC as ePub files",
+  "version": "0.0.4",
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
+  "icons": {
+    "64": "icons/icon.png"
+  },
+  "background":
+    {
+      "scripts": [
+        "addon/background.js"
+      ]
+    },
+  "page_action": {
+    "default_icon": {
+      "64": "icons/icon.png"
+    },
+    "default_title": "jjwxc2epub",
+    "show_matches": ["*://*.jjwxc.net/onebook.php?novelid=*"]
+  },
+  "web_accessible_resources": ["addon/woff2.wasm"],
+
+  "permissions": [
+    "*://*.jjwxc.net/*",
+    "cookies",
+    "downloads",
+    "activeTab",
+    "tabs",
+    "webNavigation"
+  ]
+}

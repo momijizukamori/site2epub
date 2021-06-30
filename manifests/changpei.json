@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+  "name": "changpei2epub",
+  "description": "Download novels from Changpei as ePub files",
+  "version": "0.0.1",
+  "icons": {
+    "64": "icons/icon.png"
+  },
+  "background":
+    {
+      "scripts": [
+        "addon/background.js"
+      ]
+    },
+  "page_action": {
+    "default_icon": {
+      "64": "icons/icon.png"
+    },
+    "default_title": "changpei2epub",
+    "show_matches": ["*://*.gongzicp.com/*"]
+  },
+  "permissions": [
+    "*://*.gongzicp.com/*",
+    "cookies",
+    "downloads",
+    "activeTab",
+    "tabs",
+    "webNavigation"
+  ]
+}
