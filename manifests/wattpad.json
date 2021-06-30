@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+  "name": "wattpad2epub",
+  "description": "Download novels from Wattpad as ePub files",
+  "version": "0.0.1",
+  "icons": {
+    "64": "icons/icon.png"
+  },
+  "background":
+    {
+      "scripts": [
+        "addon/background.js"
+      ]
+    },
+  "page_action": {
+    "default_icon": {
+      "64": "icons/icon.png"
+    },
+    "default_title": "wattpad2epub"
+  },
+  "permissions": [
+    "*://*.wattpad.com/*",
+    "cookies",
+    "downloads",
+    "activeTab",
+    "webNavigation"
+  ]
+}
