@@ -16,7 +16,8 @@
     "default_icon": {
       "64": "icons/icon.png"
     },
-    "default_title": "wattpad2epub"
+    "default_title": "wattpad2epub",
+    "show_matches": ["*://*.wattpad.com/story/*"]
   },
   "permissions": [
     "*://*.wattpad.com/*",

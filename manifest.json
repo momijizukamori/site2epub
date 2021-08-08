@@ -1,9 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "jjwxc2epub",
-  "description": "Download novels from JJWXC as ePub files",
-  "version": "0.0.4",
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
+  "name": "wattpad2epub",
+  "description": "Download novels from Wattpad as ePub files",
+  "version": "0.0.1",
   "icons": {
     "64": "icons/icon.png"
   },
@@ -17,17 +16,14 @@
     "default_icon": {
       "64": "icons/icon.png"
     },
-    "default_title": "jjwxc2epub",
-    "show_matches": ["*://*.jjwxc.net/onebook.php?novelid=*"]
+    "default_title": "wattpad2epub",
+    "show_matches": ["*://*.wattpad.com/story/*"]
   },
-  "web_accessible_resources": ["addon/woff2.wasm"],
-
   "permissions": [
-    "*://*.jjwxc.net/*",
+    "*://*.wattpad.com/*",
     "cookies",
     "downloads",
     "activeTab",
-    "tabs",
     "webNavigation"
   ]
 }

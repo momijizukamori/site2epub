@@ -17,7 +17,8 @@
     "default_icon": {
       "64": "icons/icon.png"
     },
-    "default_title": "jjwxc2epub"
+    "default_title": "jjwxc2epub",
+    "show_matches": ["*://*.jjwxc.net/onebook.php?novelid=*"]
   },
   "web_accessible_resources": ["addon/woff2.wasm"],
 

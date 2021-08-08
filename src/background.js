@@ -50,7 +50,7 @@ class EpubMaker {
             });
         });
 
-        browser.runtime.onMessage.addListener( (message, sender) => {this.messageHandler(message, sender)});
+        browser.runtime.onMessage.addListener( (message, sender) => {this.messageHandler(message, sender);});
     }
 
     handleMetadata(metadata) {
@@ -61,10 +61,10 @@ class EpubMaker {
 
     getCover(url) {
         let coverProm = fetch(url).then( resp => {
-            if (resp['ok']) {
+            if (resp.ok) {
                 return resp.arrayBuffer();
             } else {
-                return null
+                return null;
             }
         }).catch(err => {
             console.log(err);
@@ -115,7 +115,7 @@ class EpubMaker {
             });
             this.ch_chain.then( vals => {
                 this.buildFinal(sender);
-            })
+            });
         } else {
             // Have to load new tabs
             let newTab = browser.tabs.create({});
@@ -192,7 +192,7 @@ class EpubMaker {
                 const objectURL = URL.createObjectURL(blob);
                 var downloading = browser.downloads.download(
                     {url: objectURL, filename: this.filename}
-                )
+                );
                 //     .finally(function() {
                 //     URL.revokeObjectURL(objectURL);
                 // })
@@ -217,12 +217,11 @@ downloader.setup();
 //     console.log("listener added");
 
 browser.webNavigation.onCompleted.addListener(details => {
-    console.log("on-completed");
     if (downloader.loadPageAction(details.url)) {
         console.log("got true");
         browser.pageAction.show(
             details.tabId
-        )
+        );
     }
 });
 // });

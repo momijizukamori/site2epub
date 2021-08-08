@@ -5,9 +5,9 @@ export class WattpadLogic extends SiteLogic {
         let metadata = null;
 
         try {
-            let author = document.querySelector('div.author-info:nth-child(1) > div:nth-child(2) > a').innerText;
+            let author = document.querySelector('.author-info__username').innerText;
             let title = document.querySelector('.story-info__title').innerText;
-            let id = document.querySelector('link [rel="canonical"]').getAttribute('href').replace(/https:\/\/www\.wattpad\.com\/story\/(\d+).*/, '$1');
+            let id = window.location.href.replace(/https:\/\/www\.wattpad\.com\/story\/(\d+).*/, '$1');
             let genre = "Wattpad";
             let cover = document.querySelector('.story-cover > img').getAttribute('src');
 
@@ -28,38 +28,41 @@ export class WattpadLogic extends SiteLogic {
     }
 
     getChapterlist(index_html) {
+        const base_url = 'https://wattpad.com';
         let chapters = [];
-        let rows = index_html.querySelector('.story-parts').querySelector('ul:nth-child(1) li a');
+        let ch_list = index_html.querySelector('.story-parts');
+        let rows = ch_list.querySelectorAll('.story-parts__part');
         rows.forEach((row, i) => {
             let ch_title = row.innerText;
-            let url = row.getAttribute('href');
+            let url = `${base_url}${row.getAttribute('href')}`;
             chapters.push({title: ch_title, url: url, num: i, summary: null});
 
         });
-        return chapters
+        return chapters;
     }
 
     async getChapter(page_html, url) {
-        let pages = parseInt(page_html.innerHTML.replace(/"pages":(\d*),/i, '$1'));
+        let pages_match = page_html.match(/"pages":(\d*),/i);
+        let pages = parseInt(pages_match[1]);
         let promises = [];
 
         for (let i = 1; i <= pages + 1; i++) {
-            let url = `${url}/page/${i}`;
-            let req = fetch(url).then(res => {
+            let pg_url = `${url}/page/${i}`;
+            let req = fetch(pg_url).then(res => {
                 return res.text().then(data => {
                     const parser = new DOMParser();
                     let page_frag = parser.parseFromString(data, "text/html");
                     return page_frag.querySelector('pre').innerHTML;
-                })
+                });
             });
             promises.push(req);
         }
 
         let text = (await Promise.all(promises)).join();
 
-        text = text.replaceAll(/<\/?pre>/, '');
-        text = text.replaceAll(/\xa0/, '');
-        text = text.replaceAll(/<p data-p-id=".{32}">/, '<p>');
+        text = text.replaceAll(/<\/?pre>/g, '');
+        text = text.replaceAll(/\xa0/g, '');
+        text = text.replaceAll(/<p data-p-id=".{32}">/g, '<p>');
 
         return text;
     }
@@ -71,7 +74,7 @@ export class WattpadLogic extends SiteLogic {
         const parser = new DOMParser();
         let chapter_frag = parser.parseFromString(xhr.responseText, "text/html");
 
-        let ch_content = await this.getChapter(chapter_frag, url);
+        let ch_content = await this.getChapter(xhr.responseText, chapter.url);
         if (ch_content) {
             return this.buildChapter(chapter.title, chapter.num, chapter.summary, ch_content);
         } else {
@@ -84,11 +87,11 @@ export class WattpadLogic extends SiteLogic {
     buildChapter(title, number, summary, content) {
         let ch_title = `${number} - ${title}`;
         let ch_body = `<h1>${ch_title}</h1>${content}`;
-        return {title: ch_title, content: ch_body}
+        return {title: ch_title, content: ch_body};
     }
 
     loadURL(url) {
-        const regex = new RegExp(/.*wattpad\.com\/story\/.*$/);
+        const regex = new RegExp(/.*wattpad\.com\/story\/.*/);
         return regex.test(url);
     }
 
