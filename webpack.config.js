@@ -48,6 +48,49 @@ module.exports = [
             }), new WebExtPlugin({ sourceDir: path.resolve(__dirname, "dist/wattpad") })],
     },
     {
+        name: "chrysgarden",
+        module: {
+            rules: [
+                {
+                    test: [/background\.js$/, /content_script\.js$/],
+                    use: [
+                        {
+                            loader: "imports-loader",
+                            options: {
+                                imports: [
+                                    "named ./sites/chrysgarden LoadUrl",
+                                    "named ./sites/chrysgarden ChrysGardenLogic SiteLogic"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        mode: "none",
+        resolve:
+            {
+                fallback: { "path": require.resolve("path-browserify") }
+            },
+        entry: {
+            content_script: "./src/content_script.js",
+            background: "./src/background.js",
+        },
+        output: {
+            path: path.resolve(__dirname, "dist/chrysgarden/addon"),
+            filename: "[name].js"
+        },
+        plugins: [new CopyPlugin({
+            patterns: [
+                { from: "./manifests/chrysgarden.json", to: path.resolve(__dirname, "dist/chrysgarden/manifest.json") },
+                { from: "./icons/icon.png", to: path.resolve(__dirname, "dist/chrysgarden/icons/icon.png") },
+            ],
+        }),
+            new webpack.ProvidePlugin({
+                process: 'process/browser.js',
+            }), new WebExtPlugin({ sourceDir: path.resolve(__dirname, "dist/chrysgarden") })],
+    },
+    {
     name: "changpei",
     module: {
         rules: [
