@@ -54,6 +54,7 @@ export class JJWXCLogic extends SiteLogic {
     async getChapter(page_html) {
         let ch_text = [];
         let ch_body = page_html.querySelector('.noveltext');
+        let ch_note = page_html.querySelector('.readsmall');
         let hasFont = false;
 
         if (ch_body) {
@@ -71,6 +72,10 @@ export class JJWXCLogic extends SiteLogic {
                     }
                 }
             });
+
+            if(ch_note) {
+                ch_text.push(ch_note.innerHTML);
+            }
 
             if (hasFont) {
                 let fontResp = await fetch(hasFont);
