@@ -42,10 +42,14 @@ export class ChrysGardenLogic extends SiteLogic {
     getChapterlist(index_html) {
         let chapters = [];
         let rows = index_html.querySelectorAll('.chapter-item a');
-        rows.forEach(row => {
+        rows.forEach((row, i) => {
             let targeturl = row.getAttribute("href");
-            let titlesplit = row.innerText.match(/Ch(\d+) - (.+)/);
-            chapters.push({title: titlesplit[2], url: targeturl, num: titlesplit[1], summary: null});
+            let titlesplit = row.innerText.match(/(?:Ch |Ch|Chapter )(\d+)(?: - (.+))?/);
+            if (titlesplit) {
+                chapters.push({title: titlesplit[2], url: targeturl, num: titlesplit[1], summary: null});
+            } else {
+                chapters.push({title: null, url: targeturl, num: i, summary: null});
+            }
         });
         return chapters
     }
@@ -129,7 +133,10 @@ export class ChrysGardenLogic extends SiteLogic {
     }
 
     buildChapter(title, number, summary, content) {
-        let ch_title = `${number} - ${title}`;
+        let ch_title = `${number}`;
+        if (title) {
+            ch_title = `${number} - ${title}`;
+        }
         let ch_body = `<h1>${ch_title}</h1><hr />${content}`
         return {title: ch_title, content: ch_body}
     }
