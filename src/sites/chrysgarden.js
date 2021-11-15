@@ -44,7 +44,7 @@ export class ChrysGardenLogic extends SiteLogic {
         let rows = index_html.querySelectorAll('.chapter-item a');
         rows.forEach((row, i) => {
             let targeturl = row.getAttribute("href");
-            let titlesplit = row.innerText.match(/(?:Ch |Ch|Chapter )(\d+)(?: - (.+))?/);
+            let titlesplit = row.innerText.match(/(?:Ch |Ch|Chapter )([.\d]+)(?: - (.+))?/);
             if (titlesplit) {
                 chapters.push({title: titlesplit[2], url: targeturl, num: titlesplit[1], summary: null});
             } else {
