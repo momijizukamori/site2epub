@@ -56,6 +56,7 @@ export class JJWXCLogic extends SiteLogic {
         let ch_body = page_html.querySelector('.noveltext');
         let ch_note = page_html.querySelector('.readsmall');
         let hasFont = false;
+        let clean_note = "";
 
         if (ch_body) {
             ch_body.classList.forEach((token) => {
@@ -65,25 +66,45 @@ export class JJWXCLogic extends SiteLogic {
             });
 
             ch_body.childNodes.forEach(function (node) {
+                console.log(ch_text);
                 if (node.nodeType == 3) {
                     let content = node.textContent.trim();
                     if (content.length > 0) {
                         ch_text.push(node.textContent);
                     }
                 }
+
             });
 
             if(ch_note) {
-                ch_text.push(ch_note.innerHTML);
+                let note = [];
+                ch_note.childNodes.forEach(function (node) {
+                    if (node.nodeType == 3) {
+                        let content = node.textContent.trim();
+                        if (content.length > 0) {
+                            note.push(node.textContent);
+                        }
+                    } else if (node.nodeType == 1 && node.nodeName != 'input' && node.childNodes.length > 0) {
+                        node.childNodes.forEach(function (node) {
+                            if (node.nodeType == 3) {
+                                let content = node.textContent.trim();
+                                if (content.length > 0) {
+                                    note.push(node.textContent);
+                                }
+                            }
+                        });
+                    }
+                });
+                clean_note = "<hr /><p>" + note.join('</p><p>') + "</p>";
             }
-
+            console.log(clean_note);
             if (hasFont) {
                 let fontResp = await fetch(hasFont);
                 let buff = await fontResp.arrayBuffer();
-                return await fontRemap(buff, "<p>" + ch_text.join('</p><p>') + "</p>");
+                return await fontRemap(buff, "<p>" + ch_text.join('</p><p>') + "</p>") + clean_note;
 
              } else {
-                    return "<p>" + ch_text.join('</p><p>') + "</p>";
+                    return "<p>" + ch_text.join('</p><p>') + "</p>" + clean_note;
             }
         } else {
                 return null;
