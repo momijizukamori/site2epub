@@ -63,7 +63,7 @@ export class ChangpeiLogic extends SiteLogic  {
 
 
     chapterTab(chapter, data) {
-        console.log("trying to get chapter data");
+        console.debug("trying to get chapter data");
         let ch_content = this.getChapter(document.body);
         if (ch_content) {
             return this.buildChapter(chapter.title, chapter.num, chapter.summary, ch_content);

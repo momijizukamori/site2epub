@@ -21,7 +21,7 @@ export class WattpadLogic extends SiteLogic {
                 language: 'en'
             };
         } catch (err) {
-            console.log(err);
+            console.debug(err);
         } finally {
             return metadata;
         }

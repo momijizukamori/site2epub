@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "chrysgarden2epub",
   "description": "Download novels from Chrysanthemum Garden as ePub files",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "icons": {
     "64": "icons/icon.png"
   },

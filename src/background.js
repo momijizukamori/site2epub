@@ -67,7 +67,7 @@ class EpubMaker {
                 return null;
             }
         }).catch(err => {
-            console.log(err);
+            console.debug(err);
             return null;
         })
     }
@@ -82,6 +82,10 @@ class EpubMaker {
             this.epub.addFonts(xhr.response, name);
         };
         xhr.addEventListener('load', loader);
+    }
+
+    convertToXHTML(html_str) {
+        return html_str.replaceAll(/<(br|hr|img|embed)([^<>\/]*)>/gi, "<$1$2 />");
     }
 
 
@@ -101,7 +105,7 @@ class EpubMaker {
                         good: true
                     });
 
-                        this.epub.addSection(xhrData.title, xhrData.content);
+                        this.epub.addSection(xhrData.title, this.convertToXHTML(xhrData.content));
                     } else {
                         this.messageDispatcher(MessageType.GET_CHAPTER, sender, {
                             total: chapterlist.length,
@@ -214,11 +218,11 @@ downloader.setup();
 
 
 // browser.runtime.onInstalled.addListener(function() {
-//     console.log("listener added");
+//     console.debug("listener added");
 
 browser.webNavigation.onCompleted.addListener(details => {
     if (downloader.loadPageAction(details.url)) {
-        console.log("got true");
+        console.debug("got true");
         browser.pageAction.show(
             details.tabId
         );

@@ -30,7 +30,7 @@ class ContentScript {
             case MessageType.GET_METADATA:
                 this.updateOverlay("Fetching metadata....");
                 let metadata = this.logic.processMetadata(document);
-                console.log(metadata);
+                console.debug(metadata);
                 if (metadata) {
                     this.messageDispatcher(metadata, MessageType.GET_METADATA);
                 }

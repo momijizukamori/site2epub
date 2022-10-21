@@ -7,6 +7,7 @@
     "browserify-fs": "^1.0.0",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",
+    "crypto-js": "^3.3.0",
     "fonteditor-core": "^2.1.7",
     "imports-loader": "^3.0.0",
     "jszip": "^3.6.0",

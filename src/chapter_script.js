@@ -14,7 +14,7 @@ class TabScript {
     }
 
     messageHandler(sender, message) {
-        console.log("got message");
+        console.debug("got message");
         switch (message.type) {
             case MessageType.GET_CHAPTER:
                 let chapter = this.logic.chapterTab(message.content.id);
@@ -27,7 +27,7 @@ class TabScript {
     }
 
     messageDispatcher(message, type){
-        console.log("dispatching message");
+        console.debug("dispatching message");
         browser.runtime.sendMessage({
             type: type,
             content: message

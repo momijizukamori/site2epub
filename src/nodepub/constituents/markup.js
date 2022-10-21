@@ -62,8 +62,8 @@ const markup = {
     result += '</head>[[EOL]]';
     result += '<body>[[EOL]]';
     if (document.coverImage) {
-      console.log("trying to get cover image?");
-      console.log(document.coverImage);
+      console.debug("trying to get cover image?");
+      console.debug(document.coverImage);
       const coverFilename = path.basename(document.coverImage.name);
       result += `  <div class='cover'><img style='height: 100%;width: 100%;' src='images/${coverFilename}' alt='Cover' /></div>[[EOL]]`;
     }

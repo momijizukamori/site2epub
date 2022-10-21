@@ -228,8 +228,8 @@ woff2.init().then(() => {
             }
         })
     });
-    console.log(JSON.stringify(mappings));
-    console.log(remap(test, mappings));
+    console.debug(JSON.stringify(mappings));
+    console.debug(remap(test, mappings));
 });
 
 function compare_glyph(a, b) {
@@ -237,7 +237,7 @@ function compare_glyph(a, b) {
 }
 
 function remap(text, mapping){
-    console.log(text);
+    console.debug(text);
     let temp_text = null;
     mapping.forEach(entry => {
         let esc = String.fromCodePoint(entry[0]);
