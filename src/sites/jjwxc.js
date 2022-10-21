@@ -146,6 +146,7 @@ export class JJWXCLogic extends SiteLogic {
         let ch_note = page_html.querySelector('.readsmall');
         let encrypted_ch = page_html.querySelector('input[name=content]');
         let hasFont = false;
+        let clean_note = "";
 
         if (encrypted_ch) {
             ch_body = await this.decryptChapter(page_html);
@@ -167,10 +168,29 @@ export class JJWXCLogic extends SiteLogic {
                         ch_text.push(node.textContent);
                     }
                 }
+
             });
 
             if (ch_note) {
-                ch_text.push(ch_note.innerHTML);
+                let note = [];
+                ch_note.childNodes.forEach(function (node) {
+                    if (node.nodeType == 3) {
+                        let content = node.textContent.trim();
+                        if (content.length > 0) {
+                            note.push(node.textContent);
+                        }
+                    } else if (node.nodeType == 1 && node.nodeName != 'input' && node.childNodes.length > 0) {
+                        node.childNodes.forEach(function (node) {
+                            if (node.nodeType == 3) {
+                                let content = node.textContent.trim();
+                                if (content.length > 0) {
+                                    note.push(node.textContent);
+                                }
+                            }
+                        });
+                    }
+                });
+                clean_note = "<hr /><p>" + note.join('</p><p>') + "</p>";
             }
 
             console.debug(ch_text);
@@ -179,10 +199,10 @@ export class JJWXCLogic extends SiteLogic {
                 console.debug("hasFont");
                 let fontResp = await fetch(hasFont);
                 let buff = await fontResp.arrayBuffer();
-                return await fontRemap(buff, "<p>" + ch_text.join('</p><p>') + "</p>");
+                return await fontRemap(buff, "<p>" + ch_text.join('</p><p>') + "</p>") + clean_note;
 
             } else {
-                return "<p>" + ch_text.join('</p><p>') + "</p>";
+                return "<p>" + ch_text.join('</p><p>') + "</p>" + clean_note;
             }
         } else {
             return null;
