@@ -131,6 +131,7 @@ export class JJWXCLogic extends SiteLogic {
                     // Try the VIP link
                     url = info.getAttribute('rel');
                 }
+                url = url.replace("http://", "https://");
                 let num = row.querySelector('td:nth-child(1)').innerText;
                 let sum = row.querySelector('td:nth-child(3)').innerText;
                 let ch = { title: ch_title, url: url, num: num, summary: sum };
@@ -142,7 +143,7 @@ export class JJWXCLogic extends SiteLogic {
 
     async getChapter(page_html) {
         let ch_text = [];
-        let ch_body = page_html.querySelector('.noveltext');
+        let ch_body = page_html.querySelector('.novelbody div');
         let ch_note = page_html.querySelector('.readsmall');
         let encrypted_ch = page_html.querySelector('input[name=content]');
         let hasFont = false;
@@ -210,10 +211,12 @@ export class JJWXCLogic extends SiteLogic {
     }
 
     async chapterXHR(chapter) {
+        console.debug(chapter);
         let xhr = new XMLHttpRequest();
         xhr.overrideMimeType('text/html; charset=gb18030');
         xhr.open("GET", chapter.url, false);
         xhr.send(null);
+        console.debug(xhr.responseText);
         const parser = new DOMParser();
         let chapter_frag = parser.parseFromString(xhr.responseText, "text/html");
 

@@ -55,6 +55,8 @@ class EpubMaker {
 
     handleMetadata(metadata) {
         this.metadata = metadata;
+        let date = new Date(Date.now());
+        this.metadata.date = date.toISOString();
         this.filename = `${this.metadata.title} - ${this.metadata.author}.epub`;
         this.epub = nodepub.document(this.metadata);
     }

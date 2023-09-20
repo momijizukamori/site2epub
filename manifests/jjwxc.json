@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "jjwxc2epub",
   "description": "Download novels from JJWXC as ePub files",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
   "icons": {
     "64": "icons/icon.png"

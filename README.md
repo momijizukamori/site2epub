@@ -7,6 +7,7 @@ A collection of extensions for creating epubs for offline reading from various o
 * `web-ext build`
 
 ### To Run ###
+* **See [the installation doc](https://github.com/momijizukamori/site2epub/blob/master/docs/INSTALLATION.md)**
 * These extensions are unsigned (for now) and will need to be run in developer mode. Download the most recent version of the site you want from the `web-ext-artifacts` folder and follow the instructions for running it for your browser:
   - Firefox - https://developer.mozilla.org/en-US/docs/Tools/about:debugging#Add-ons
   - Chrome - https://webkul.com/blog/how-to-install-the-unpacked-extension-in-chrome/
