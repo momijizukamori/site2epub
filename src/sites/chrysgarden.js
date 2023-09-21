@@ -7,6 +7,7 @@ export class ChrysGardenLogic extends SiteLogic {
     constructor() {
         super();
         this.fontMap = new Map();
+        this.pw = '';
 
         for (let index in jumbled) {
             this.fontMap.set(jumbled[index], orig[index]);
@@ -63,6 +64,9 @@ export class ChrysGardenLogic extends SiteLogic {
 
             paras.forEach( (p) => {
                 let clean_p = [];
+                if (p.style.overflow == "hidden") {
+                    // Ignore it
+                } else {
                 p.childNodes.forEach(node => {
                     if (node.nodeName.match(/span/i)) {
                         if (node.style.overflow == "hidden") {
@@ -82,7 +86,8 @@ export class ChrysGardenLogic extends SiteLogic {
                     } else {
                         clean_p.push(node.outerHTML);
                     }
-                })
+                });
+            }
                 ch_text.push(clean_p.join(""));
             });
 
@@ -109,6 +114,17 @@ export class ChrysGardenLogic extends SiteLogic {
         xhr.send(null);
         const parser = new DOMParser();
         let chapter_frag = parser.parseFromString(xhr.responseText, "text/html");
+
+        let pw_form = chapter_frag.querySelector('#password-lock');
+
+        // pw-locked chapter
+        if (pw_form) {
+            let form = new FormData(pw_form);
+            form.set('site-pass', this.pw);
+            xhr.open("POST", chapter.url, false);
+            xhr.send(form);
+            chapter_frag = parser.parseFromString(xhr.responseText, "text/html");
+        }
 
         let ch_content = await this.getChapter(chapter_frag);
         if (ch_content) {
@@ -144,6 +160,10 @@ export class ChrysGardenLogic extends SiteLogic {
     loadURL(url) {
         const regex = new RegExp(/.*chrysanthemumgarden\.com\/novel-tl\/.*/);
         return regex.test(url);
+    }
+
+    usePw() {
+        return true;
     }
 
 }

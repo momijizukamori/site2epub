@@ -72,4 +72,9 @@ export class SiteLogic {
         // return true if the page action should become active, false if not.
         return true;
     }
+
+    usePw() {
+        // return true to ask for a pw in the metadata section
+        return false;
+    }
 }

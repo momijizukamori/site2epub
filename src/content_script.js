@@ -19,6 +19,10 @@ class ContentScript {
     }
     setup() {
         browser.runtime.onMessage.addListener( (message, sender) => {this.messageHandler(sender, message)});
+        if (this.logic.usePw()) {
+            let pw = prompt("Site password. Note: you can continue without filling this in, but you may not get all chapters");
+            this.messageDispatcher(pw, MessageType.GET_PW);
+        }
         this.injectOverlay();
         this.updateOverlay("Fetching metadata....");
         let metadata = this.logic.processMetadata(document.body);

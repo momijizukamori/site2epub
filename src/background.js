@@ -14,6 +14,10 @@ class EpubMaker {
 
     messageHandler(message, sender) {
         switch (message.type) {
+            case MessageType.GET_PW:
+                this.logic.pw = message.content;
+                console.debug(this.logic.pw);
+                break;
             case MessageType.GET_CHAPTER:
                 let built_ch = message.content.chapter;
                 let chapter_id = parseInt(message.content.id, 10);
