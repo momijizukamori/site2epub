@@ -42,17 +42,13 @@ export class JJWXCLogic extends SiteLogic {
         var end = offset + 16;
         var utf8_iv = "";
         var utf8_key = "";
-        if (offset > 16) {
-            end = end % 16;
-            utf8_key = hex.slice(end, start);
-            utf8_iv = hex.slice(start) + hex.slice(0, end);
 
-        } else {
-            utf8_iv = hex.slice(start, end);
-            utf8_key = hex.slice(end) + hex.slice(0, start);
-        }
+        var shifted = hex.slice(offset) + hex.slice(0, offset);
+        utf8_iv = shifted.slice(0, 16);
+        utf8_key = shifted.slice(-16);
+
         console.debug(utf8_iv, utf8_key);
-        return { key: utf8_key, iv: utf8_iv };
+        return { key: utf8_iv, iv: utf8_key };
 
     }
 
@@ -66,7 +62,17 @@ export class JJWXCLogic extends SiteLogic {
         return CryptoJS.enc.Utf8.stringify(decrypted);
     }
 
-    async decryptChapter(page_html) {
+    charCodeSum(input) {
+
+        var acc = 0;
+        for (let i = 0; i < input.length; i++) {
+          acc += input.charCodeAt(i);
+        }
+        return acc;
+      }
+    
+
+      async decryptChapter(page_html) {
         var novelid = page_html.querySelector('input[name=novelid').value;
         var chapterid = page_html.querySelector('input[name=chapterid').value;
         var cryptinfo = page_html.querySelector('input[name=cryptInfo').value;
@@ -75,38 +81,49 @@ export class JJWXCLogic extends SiteLogic {
         var cookie = await browser.cookies.get({ name: "JJEVER", url: "http://www.jjwxc.net/" });
         console.debug(cookie);
 
+        // JJWXC has added an alternate key format - which VIP chapters it's used on depends on
+        // whether the chapter number is odd or even, and if the novel id is odd or even.
+        // Odd novel ids - the alternate format is used on even chapters
+        // Even novel ids - the alternate format is used on odd chapters
+        var chapter_int = parseInt(chapterid, 10);
+        var novel_int = parseInt(novelid, 10);
+        var useAlt = chapter_int % 2 != novel_int % 2;
+        console.debug(chapter_int);
+
         let cookie_val = decodeURIComponent(cookie.value);
         let parsed_cookie = JSON.parse(cookie_val);
         var readerid = parsed_cookie.foreverreader;
-        console.debug(novelid, chapterid, cryptinfo, accesskey, readerid);
+        console.log(novelid, chapterid, cryptinfo, accesskey, readerid, useAlt);
 
         let ch_content = null;
 
+        var rand = this.charCodeSum(accesskey);
+        // The offset used to slice the first hash depends on whether we're using the alt format or not
+        var offset1 = useAlt ? (rand - 16) % 33 : (rand + 16) % 32;
+        // ...but it uses the same offset for the second hash either way.
+        var offset2 = (rand + 16) % 32;
 
+        var input1 = useAlt ? `${accesskey}-${novelid}-${chapterid}-${readerid}` : `${novelid}.${chapterid}.${readerid}.${accesskey}`;
 
-        // The position at which the MD5 hashes are split into the key and iv varies
-        // per load. I haven't figured out the deterministic way to find it, but it's short
-        // enough to bruteforce by running through all the split positions and seeing what
-        // gives us good data.
-        for (let i = 0; i < 33; i++) {
-
-            var input1 = `${novelid}.${chapterid}.${readerid}.${accesskey}`;
-            var params1 = this.MD5process(input1, i);
-            try {
-                var output1 = JSON.parse(atob(this.DESDecode(cryptinfo, params1)));
-                console.debug(output1); // should look like { time: 1666289067, key: "RwUpuyA", ver: "20220527" };
-
-                var input2 = `${output1.key}${output1.time}${readerid}`;
-                var params2 = this.MD5process(input2, i);
-                var params2swap = { key: params2.iv, iv: params2.key };
-
-                ch_content = this.DESDecode(content, params2swap);
-
-                break;
-            } catch {
-                continue;
-            }
+        var params1, output1;
+        try {
+            params1 = this.MD5process(input1, offset1);
+            output1 = JSON.parse(atob(this.DESDecode(cryptinfo, params1)));
+            console.log(output1); // should look like { time: 1666289067, key: "RwUpuyA", ver: "20220527" };  
+        } catch {
+            // For some reason sometimes the calculation is off by 1, but only on chapters using the alt offset?
+            console.error(`chapter ${chapterid} offset was off by 1!`);
+            params1 = this.MD5process(input1, offset1 - 1);
+            output1 = JSON.parse(atob(this.DESDecode(cryptinfo, params1)));
+            console.log(output1); // should look like { time: 1666289067, key: "RwUpuyA", ver: "20220527" };  
         }
+
+        var input2 = `${output1.key}${output1.time}${readerid}`;
+        var params2 = this.MD5process(input2, offset2);
+        var params2swap = { key: params2.iv, iv: params2.key };
+
+        ch_content = this.DESDecode(content, params2swap);
+
 
         console.debug(ch_content);
         if (ch_content) {
