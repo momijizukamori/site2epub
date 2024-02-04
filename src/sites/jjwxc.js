@@ -163,6 +163,8 @@ export class JJWXCLogic extends SiteLogic {
         let ch_body = page_html.querySelector('.novelbody div');
         let ch_note = page_html.querySelector('.readsmall');
         let encrypted_ch = page_html.querySelector('input[name=content]');
+        let styles = page_html.styleSheets;
+        let sourceStyle = null;
         let hasFont = false;
         let clean_note = "";
 
@@ -179,12 +181,70 @@ export class JJWXCLogic extends SiteLogic {
                 }
             });
 
+            const cssChecker = function(cssRule, cssClass) {
+                // check if it's a style rule, and return early if not.
+                if (cssRule.type != 1) {
+                    return null;
+                }
+                let re = new RegExp(`${cssClass}::(before|after)`);
+                let matches = cssRule.selectorText.match(re);
+                if (matches) {
+                    let order = matches[1];
+                    let content = cssRule.style.content.replaceAll('"', '');
+                    return {order, content};
+                }
+                return null;
+            };
+
+            let text_acc = "";
             ch_body.childNodes.forEach(function(node) {
+                if (node.nodeName == "SPAN") {
+                    // JJWXC does some absolute fuckery with inserting text
+                    // via ::before and ::after pseudo-elements, so we need to reconstruct that.
+                    let cssClass = node.className;
+                    let text = node.innerText;
+                    let check = null;
+                    if (sourceStyle) {
+                        for (let rule of sourceStyle.rules) {
+                            check = cssChecker(rule, cssClass);
+                            if (check) { break; }
+                        }
+                    } else {
+                        // we don't know where the rules we need are, gotta iterate over all of them :\
+                        for (let style of styles) {
+                            // code is always in an inline style, so skipped the linked ones.
+                            if (style.ownerNode && style.ownerNode.nodeName == "LINK") {continue;}
+                            if (sourceStyle) { break; }
+                            for (let rule of style.rules){
+                                check = cssChecker(rule, cssClass);
+                                if (check) {
+                                    // all the strings will be in the same stylesheet, so next time we can skip full iteration
+                                    sourceStyle = style;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (check) {
+                        let {order, content} = check;
+                        text_acc = text_acc + (order == 'before' ? content + text : text + content);
+                    } else {
+                        text_acc = text_acc + text;
+                    }
+                }
                 if (node.nodeType == 3) {
+                    // plain text node, remove whitespace and add it
                     let content = node.textContent.trim();
                     if (content.length > 0) {
-                        ch_text.push(node.textContent);
+                        text_acc = text_acc + content;
                     }
+                }
+                if (node.nodeName == "BR" && text_acc.length > 0) {
+                    // We've hit a linebreak, and we have some saved-up text
+                    // Push the text to the array, and start accumulating more
+                    ch_text.push(text_acc);
+                    text_acc = '';
                 }
 
             });
@@ -239,8 +299,16 @@ export class JJWXCLogic extends SiteLogic {
 
         let ch_content = await this.getChapter(chapter_frag);
         if (ch_content) {
-            console.debug(ch_content);
-            return this.buildChapter(chapter.title, chapter.num, chapter.summary, ch_content);
+            // Do some cleanup. This
+            // 1) removes zero-width nonjoiner and ideographic space (which trim() doesn't catch)
+            // 2) removes JJWXC's insert text
+            // 3) changes <hr> and <br> to be self-closing (required for XHTML)
+            let cleaned = ch_content
+                .replaceAll(/[\u200C\u3000]/g, '')
+                .replaceAll('@无限好文，尽在晋江文学城', '')
+                .replaceAll(/<(b|h)r>/gi, '<$1r/>');
+            console.debug(cleaned);
+            return this.buildChapter(chapter.title, chapter.num, chapter.summary, cleaned);
         } else {
             return null;
         }

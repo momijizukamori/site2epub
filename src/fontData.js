@@ -239,14 +239,14 @@ export function fontRemap(fontbuff, text) {
         let data = [];
 
         fontObject['glyf'].forEach((glyph) => {
-            console.debug(glyph);
+            // console.debug(glyph);
             fontData.forEach((glyph2) => {
                 if (compare_glyph(glyph, glyph2)) {
                     mappings.push([glyph.unicode[0],  glyph2.unicode]);
                 }
             })
         });
-        console.debug(mappings);
+        // console.debug(mappings);
         return remap(text, mappings);
     });
 }
