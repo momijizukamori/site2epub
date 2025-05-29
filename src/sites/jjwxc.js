@@ -248,6 +248,10 @@ export class JJWXCLogic extends SiteLogic {
                 }
 
             });
+            // Done, push any remaining accumulated text
+            if (text_acc.length > 0) {
+                ch_text.push(text_acc);
+            }
 
             if (ch_note) {
                 let note = [];
