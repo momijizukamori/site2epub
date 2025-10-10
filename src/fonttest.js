@@ -209,7 +209,7 @@ var test = ` 长庚的话音低而含混, 哪怕贴着耳朵，顾昀\uef3c‌�
 
 woff2.init().then(() => {
 
-    let buffer2 = fs.readFileSync('/home/ruth/Downloads/jjwxcfont_004z1.woff2');
+    let buffer2 = fs.readFileSync('CG.woff2');
     // read
     let font2 = Font.create(buffer2, {
         type: 'woff2'
@@ -219,17 +219,18 @@ woff2.init().then(() => {
     let mappings = [];
 
     let data = [];
-
+    const unicodeLookup = function (i) { return i.unicode ? String.fromCodePoint(i.unicode[0]) : null };
     fontObject2['glyf'].forEach((glyph) => {
-       // data.push({xMin: glyph.xMin, xMax: glyph.xMax, yMin: glyph.yMin, yMax: glyph.yMax, contours: glyph.contours.length, unicode: replacements[i]})
-        fontData.forEach((glyph2) => {
-            if (compare_glyph(glyph, glyph2)) {
-                mappings.push([glyph.unicode[0],  glyph2.unicode]);
-            }
-        })
+       data.push({xMin: glyph.xMin, xMax: glyph.xMax, yMin: glyph.yMin, yMax: glyph.yMax, contours: glyph.contours.length, unicode: unicodeLookup(glyph)})
+       // console.log(glyph);
+       // fontData.forEach((glyph2) => {
+        //     if (compare_glyph(glyph, glyph2)) {
+        //         mappings.push([glyph.unicode[0],  glyph2.unicode]);
+        //     }
+        // })
     });
-    console.debug(JSON.stringify(mappings));
-    console.debug(remap(test, mappings));
+    console.debug(JSON.stringify(data));
+    // console.debug(remap(test, mappings));
 });
 
 function compare_glyph(a, b) {

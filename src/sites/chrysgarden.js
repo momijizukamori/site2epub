@@ -1,3 +1,4 @@
+import { fontRemap } from '../fontUtils';
 import {SiteLogic} from './generic';
 
 const orig = "tonquerzlawicvfjpsyhgdmkbxJKABRUDQZCTHFVLIWNEYPSXGOM";
@@ -59,6 +60,31 @@ export class ChrysGardenLogic extends SiteLogic {
         let ch_text = [];
         let ch_body = page_html.querySelector('#novel-content');
 
+        const processNode = async function(node) {
+            if (node.nodeName.match(/span/i)) {
+                if (node.style.overflow == "hidden") {
+                    return null
+                }
+                else if (node.style.fontFamily) {
+                    const fontLoc = `https://chrysanthemumgarden.com/wp-content/plugins/chrys-garden-plugin/resources/fonts/used/${node.style.fontFamily}.woff2`;
+                    let fontResp = await fetch(fontLoc);
+                    let buff = await fontResp.arrayBuffer();
+                    let text = await fontRemap(buff, node.innerText, 'cg', node.style.fontFamily);
+                    return text
+                } else {
+                    let content = node.innerText.trim();
+                    if (content.length > 0) {
+                        return node.innerHTML;
+                    }
+                }
+            } else if (node.nodeType == 3) {
+                // Text-only node
+                return node.textContent;
+            } else {
+                return node.outerHTML;
+            }
+        };
+
         if (ch_body) {
             let paras = ch_body.querySelectorAll("p");
 
@@ -68,30 +94,23 @@ export class ChrysGardenLogic extends SiteLogic {
                     // Ignore it
                 } else {
                 p.childNodes.forEach(node => {
-                    if (node.nodeName.match(/span/i)) {
-                        if (node.style.overflow == "hidden") {
-                            // Ignore it
-                        }
-                        else if (node.classList.contains("jum")) {
-                            clean_p.push(this.fontRemap(node.innerText));
-                        } else {
-                            let content = node.innerText.trim();
-                            if (content.length > 0) {
-                                clean_p.push(node.innerHTML);
-                            }
-                        }
-                    } else if (node.nodeType == 3) {
-                        // Text-only node
-                        clean_p.push(node.textContent);
-                    } else {
-                        clean_p.push(node.outerHTML);
-                    }
+                    let ret = processNode(node);
+                    clean_p.push(ret);
                 });
             }
-                ch_text.push(clean_p.join(""));
-            });
+            ch_text.push(clean_p)
+            Promise.all(clean_p).then((values) => {
+                ch_text.push(values.join(""));
+            })
 
-            return "<p>" + ch_text.join('</p><p>') + "</p>";
+            });
+            const data = await Promise.all(
+                ch_text.map(async clean => await Promise.all(clean).then(values => values.join("")))
+                )
+            
+            console.log(data)
+
+            return "<p>" + data.join('</p><p>') + "</p>";
         } else {
                 return null;
         }

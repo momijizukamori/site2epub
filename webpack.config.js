@@ -84,6 +84,7 @@ module.exports = [
             patterns: [
                 { from: "./manifests/chrysgarden.json", to: path.resolve(__dirname, "dist/chrysgarden/manifest.json") },
                 { from: "./icons/icon.png", to: path.resolve(__dirname, "dist/chrysgarden/icons/icon.png") },
+                { from: "./src/woff2.wasm", to: path.resolve(__dirname, "dist/chrysgarden/addon/woff2.wasm") },
             ],
         }),
             new webpack.ProvidePlugin({

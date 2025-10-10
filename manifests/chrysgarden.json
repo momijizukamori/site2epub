@@ -2,7 +2,8 @@
   "manifest_version": 2,
   "name": "chrysgarden2epub",
   "description": "Download novels from Chrysanthemum Garden as ePub files",
-  "version": "0.0.5",
+  "version": "0.0.6",
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
   "icons": {
     "64": "icons/icon.png"
   },
@@ -19,6 +20,7 @@
     "default_title": "chrysgarden2epub",
     "show_matches": ["*://*.chrysanthemumgarden.com/novel-tl/*"]
   },
+  "web_accessible_resources": ["addon/woff2.wasm"],
   "permissions": [
     "*://*.chrysanthemumgarden.com/*",
     "cookies",

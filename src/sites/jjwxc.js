@@ -1,5 +1,5 @@
 import { SiteLogic } from './generic';
-import { fontRemap } from "../fontData";
+import { fontRemap } from "../fontUtils";
 var CryptoJS = require("crypto-js");
 
 export class JJWXCLogic extends SiteLogic {
@@ -281,7 +281,7 @@ export class JJWXCLogic extends SiteLogic {
                 console.debug("hasFont");
                 let fontResp = await fetch(hasFont);
                 let buff = await fontResp.arrayBuffer();
-                return await fontRemap(buff, "<p>" + ch_text.join('</p><p>') + "</p>") + clean_note;
+                return await fontRemap(buff, "<p>" + ch_text.join('</p><p>') + "</p>", 'jjwxc') + clean_note;
 
             } else {
                 return "<p>" + ch_text.join('</p><p>') + "</p>" + clean_note;
