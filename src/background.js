@@ -5,6 +5,7 @@ var MESSAGE_TYPE = require('./message_type');
 //import {SiteLogic} from './sites/generic';
 
 const MessageType = MESSAGE_TYPE.MessageType;
+const illegal_chars = /[*"\/\\<>:|?]/gi;
 
 class EpubMaker {
     constructor() {
@@ -61,7 +62,9 @@ class EpubMaker {
         this.metadata = metadata;
         let date = new Date(Date.now());
         this.metadata.date = date.toISOString();
-        this.filename = `${this.metadata.title} - ${this.metadata.author}.epub`;
+        let unclean_name = `${this.metadata.title} - ${this.metadata.author}`;
+
+        this.filename = `${unclean_name.replaceAll(illegal_chars, "_")}.epub`;
         this.epub = nodepub.document(this.metadata);
     }
 

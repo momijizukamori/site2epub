@@ -79,7 +79,7 @@ export class ChrysGardenLogic extends SiteLogic {
                 }
             } else if (node.nodeType == 3) {
                 // Text-only node
-                return node.textContent;
+                return node.textContent.replaceAll(">", "&gt;").replaceAll("<", "&lt;");
             } else {
                 return node.outerHTML;
             }
